@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 
@@ -55,7 +56,7 @@ const registerUser=asyncHandler(async(req,res)=>{
 
 
 const loginUser=asyncHandler(async(req,res)=>{
-    const {identifier,password}=req.body;
+    const {email,password}=req.body;
 
     if(!email){
         throw new ApiError(400,"email is required");

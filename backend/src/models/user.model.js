@@ -27,6 +27,15 @@ const userSchema=new mongoose.Schema({
         type:String,
         required:[true,"password is required"],
     },
+    userType:{
+        type: String,
+        enum: ['admin', 'user', 'guest'], 
+        default: 'user',
+    }
+    ,
+    otp:{
+        type:Number,
+    },
     refreshToken:{
         type:String
     }
@@ -38,8 +47,18 @@ userSchema.pre("save",async function(next){
     next();
 })
 
+userSchema.pre("save",async function(next){
+    let otp=Math.floor(100000 + Math.random() * 900000);;
+    this.otp=await bcrypt.hash(this.otp,10);
+    next();
+})
+
 userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password)
+}
+
+userSchema.methods.validateOtp=async function(otp){
+    return await bcrypt.compare(otp,this.otp)
 }
 
 userSchema.methods.generateAccessToken=function(){

@@ -1,50 +1,24 @@
-import { ApiResponse } from "../utils/ApiResponse.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import axios from "axios";
+import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const smartSearch = asyncHandler(async (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const { search } = req.body;
+// Load environment variables from a .env file
+dotenv.config();
 
-  if (!search) {
-    return res.status(400).json(
-      new ApiResponse(400, "Unable to recognize text. Please provide valid input.")
-    );
-  }
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+const smartSearch = async (req, res) => {
   try {
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-3.5-turbo", 
-        messages: [{ role: "user", content: search }],
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        timeout:100000
-      }
-    );
+    const prompt = "Create 5 funny and witty jokes about generative AI";
 
-    const completion = response.data.choices[0].message.content;
-
-  
-    return res.status(200).json(
-      new ApiResponse(200, "Success", {
-        completion: completion,
-      })
-    );
-  } catch (error) {
-    console.error("Error:", error);
-
-    return res.status(500).json(
-      new ApiResponse(500, "Error fetching response from OpenAI", {
-        error: error.message || "An unknown error occurred",
-      })
-    );
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    res.send(text);
+  } catch (err) {
+    console.log(err);
+    res.send("Unexpected Error!!!");
   }
-});
+};
 
 export { smartSearch };

@@ -24,3 +24,11 @@ app.use("/api/v1/users",userRouter)
 
 
 export { app }
+
+
+
+
+
+
+// certain CORS requests are considered 'complex' amnd require an initial OPTIONS request ( called the pre-flight request ) . an example of a complex CORS request is one that uses an HTTP verb other than GET/HEAD/POST ( such as DELETE ) or that uses custom headers .
+// cookie-parser -> parse cookie header and populate req.cookies with an object keyed by the cookie names . optionally you may enable signed cookie support by passing a secret string , which assigns req.secret so it may be used by other middleware 

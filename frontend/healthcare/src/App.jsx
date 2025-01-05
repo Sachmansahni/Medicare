@@ -12,6 +12,8 @@ import Sellerdash from './components/pages/Sellerdash.jsx'
 import Uploadprescription from './components/pages/Uploadprescription.jsx'
 import Payment from './components/pages/Payment.jsx'
 import Cart from './components/pages/Cart.jsx'
+import ShopNow from './components/pages/ShopNow.jsx'
+import CartPage from './components/pages/Cart.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,6 +32,8 @@ function App() {
           <Route path="uploadPrescription" element={<Uploadprescription/>}/>
           <Route path="payment" element={<Payment/>}/>
           <Route path="cart" element={<Cart/>}/>
+          <Route path="shop" element={<ShopNow/>}/>
+          <Route path="cart" element={<CartPage/>}/>
 
         </Route>
       </Routes>

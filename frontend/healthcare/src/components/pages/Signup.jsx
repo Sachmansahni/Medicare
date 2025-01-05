@@ -1,11 +1,51 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      age: formData.get('age'),
+      password: formData.get('password'),
+    };
+
+    try {
+      const response = await fetch('/api/v1/users/signup', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {  // Check if the response status is 2xx (success)
+        alert('User registered successfully!');
+        setTimeout(() => {
+          navigate('/');  // Navigate to home or login page after successful signup
+        }, 2000);
+      } else {
+        alert(result.message || 'Error in signing up! Try again later.');
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+  };
+
   return (
     <div className="bg-blue-50 min-h-screen flex items-center justify-center p-4">
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
         <h1 className="text-2xl font-bold text-blue-600 mb-6 text-center">Sign Up</h1>
-        <form action="" className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             name="name"

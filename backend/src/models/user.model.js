@@ -29,10 +29,14 @@ const userSchema=new mongoose.Schema({
     },
     userType:{
         type: String,
-        enum: ['admin', 'user', 'guest'], 
-        default: 'user',
+        enum: ['seller', 'user', 'guest'], 
+        default: 'seller',
     }
     ,
+    age:{
+        type:String,
+
+    },
     otp:{
         type:Number,
     },
@@ -41,17 +45,21 @@ const userSchema=new mongoose.Schema({
     }
 },{timestamps:true})
 
-userSchema.pre("save",async function(next){
-    if(!this.isModified("password")) return next
-    this.password=await bcrypt.hash(this.password,10);
-    next();
-})
+userSchema.pre("save", async function(next) {
+    // If the password is modified, hash it
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
 
-userSchema.pre("save",async function(next){
-    let otp=Math.floor(100000 + Math.random() * 900000);;
-    this.otp=await bcrypt.hash(this.otp,10);
+    // Always hash the OTP when creating a new user (ensure it's a string)
+    if (this.isNew) {
+        let otp = Math.floor(100000 + Math.random() * 900000);  // Generate OTP
+        this.otp = await bcrypt.hash(otp.toString(), 10);  // Ensure OTP is a string before hashing
+    }
+
     next();
-})
+});
+
 
 userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password)

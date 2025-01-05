@@ -41,9 +41,8 @@ const registerUser=asyncHandler(async(req,res)=>{
         password
     })
 
-    const isCreated=User.findById(user._id).select(
-        "-password -refreshToken"
-    )
+    const isCreated = await User.findById(user._id).select("-password -refreshToken").lean();
+
 
     if(!isCreated){
         throw new ApiError(500,"something went wrong while registering the user ")
@@ -89,6 +88,8 @@ const loginUser=asyncHandler(async(req,res)=>{
     }
 
     console.log("user found");
+    req.user=loggedInUser
+    console.log(req.user);  
 
     return res.status(200)
     .cookie("accessToken",accessToken,options)
@@ -104,4 +105,27 @@ const loginUser=asyncHandler(async(req,res)=>{
     )
 })
 
-export {registerUser,loginUser}
+const logoutUser=asyncHandler(async(req,res)=>{
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                refreshToken: undefined
+            }
+        },{
+            new:true
+        }
+    )
+    const options={
+        httpOnly:true,
+        secure:true
+    }
+
+    return res 
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(new ApiResponse(200,{},"User logged Out successfully"))
+})
+
+export {registerUser,loginUser,logoutUser}

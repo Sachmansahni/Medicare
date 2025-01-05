@@ -1,9 +1,28 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../../contexts/userContext'; // Import the useUser hook
 
 export default function Header() {
+  const { user, isAuthenticated, logout } = useUser(); // Get user data and authentication state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const links = ['Home', 'Search', 'Upload', 'Help', 'Services'];
+  const navigate = useNavigate();
+
+  const navigateToLogin = () => {
+    navigate('/login');
+  };
+
+  const navigateToSignup = () => {
+    navigate('/signup');
+  };
+
+  const navigateToAddMedicine = () => {
+    navigate('/sellerDash'); // Navigate to the add medicine page
+  };
+
+  const handleLogout = () => {
+    logout(); // Logout using context, which also removes from localStorage
+    navigate('/login');
+  };
 
   return (
     <header className="bg-white shadow-md">
@@ -52,7 +71,7 @@ export default function Header() {
           </button>
         </div>
 
-
+        {/* Links */}
         <div
           className={`${
             isMenuOpen ? 'block' : 'hidden'
@@ -60,34 +79,96 @@ export default function Header() {
         >
           <ul className="flex flex-col md:flex-row gap-6 text-lg text-gray-700 items-center px-6 md:px-0 py-4 md:py-0">
             <li><Link to="/">Home</Link></li>
-            <li><Link to="search">Search</Link></li>
-            <li><Link to="uploadPrescription">Upload</Link></li>
-            <li><Link to="contact">Help</Link></li>
-            <li><Link to="about">Services</Link></li>
-
+            <li><Link to="/shop">Search</Link></li>
+            <li><Link to="/uploadPrescription">Upload</Link></li>
+            <li><Link to="/contact">Help</Link></li>
+            <li><Link to="/about">Services</Link></li>
           </ul>
         </div>
 
-        {/* Auth Buttons */}
+        {/* Auth Buttons / User Info */}
         <div className="hidden md:flex gap-4">
-          <button className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition shadow-sm">
-            Login
-          </button>
-          <button className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition shadow-sm">
-            Signup
-          </button>
+          {isAuthenticated ? (
+            <>
+              <span className="text-gray-800 font-semibold">Welcome, {user?.name}</span>
+
+              {/* Role-based Navigation */}
+              {user?.userType === 'seller' && (
+                <button 
+                  onClick={navigateToAddMedicine}
+                  className="px-6 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition shadow-sm"
+                >
+                  Seller Dash
+                </button>
+              )}
+              
+              {/* Logout Button */}
+              <button 
+                onClick={handleLogout}
+                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition shadow-sm"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                onClick={navigateToLogin}
+                className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition shadow-sm"
+              >
+                Login
+              </button>
+              <button 
+                onClick={navigateToSignup}
+                className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition shadow-sm"
+              >
+                Signup
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
       {/* Mobile Auth Buttons */}
       {isMenuOpen && (
         <div className="block md:hidden px-6 py-4 bg-white shadow-md">
-          <button className="w-full mb-3 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition shadow-sm">
-            Login
-          </button>
-          <button className="w-full px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition shadow-sm">
-            Signup
-          </button>
+          {isAuthenticated ? (
+            <>
+              <span className="block mb-3 text-gray-800 font-semibold">Welcome, {user?.name}</span>
+
+              {/* Role-based Navigation */}
+              {user?.role === 'seller' && (
+                <button
+                  onClick={navigateToAddMedicine}
+                  className="w-full mb-3 px-6 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition shadow-sm"
+                >
+                  Add Medicine
+                </button>
+              )}
+              
+              <button
+                onClick={handleLogout}
+                className="w-full mb-3 px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition shadow-sm"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={navigateToLogin}
+                className="w-full mb-3 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition shadow-sm"
+              >
+                Login
+              </button>
+              <button
+                onClick={navigateToSignup}
+                className="w-full px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition shadow-sm"
+              >
+                Signup
+              </button>
+            </>
+          )}
         </div>
       )}
     </header>

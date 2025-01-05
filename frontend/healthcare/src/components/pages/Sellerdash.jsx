@@ -1,7 +1,10 @@
 import React from 'react'
+import AddMedicine from './AddMedicine'
 
 export default function Sellerdash() {
   return (
-    <div>Sellerdash</div>
+    <div>
+      <AddMedicine/>
+    </div>
   )
 }
